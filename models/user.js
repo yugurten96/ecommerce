@@ -4,4 +4,4 @@ const userSchema = mongoose.Schema({
 
 })
 
-exports.Product = mongoose.model('Product', userSchema);
+exports.User = mongoose.model('User', userSchema);
