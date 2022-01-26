@@ -1,11 +1,16 @@
 const express = require("express");
 const {Product} = require("../models/product");
 const {Category} = require("../models/category");
+const mongoose = require("mongoose");
 const router = express.Router();
 
 //get all products
 router.get("/", async(req, res)=>{
-    const productList = await Product.find();
+    let filter = {}
+    if(req.query.categories){
+        filter = {category: req.query.categories.split(',')}
+    }
+    const productList = await Product.find(filter).populate('category');
     res.send(productList)
 })
 
@@ -49,6 +54,9 @@ router.post("/", async (req, res)=>{
 
 //update product
 router.put("/:id", async (req, res) => {
+    if(!mongoose.isValidObjectId(req.params.id)) {
+        return res.status(400).send("invalid product ID!")
+    }
     const category = await Category.findById(req.body.category)
     if(!category) return res.status(400).send("invalid category!")
 
@@ -89,5 +97,25 @@ router.delete("/:id", (req, res)=> {
     })
 
 })
+//count products
+router.get("/get/count",async (req, res)=> {
+    const productCount = await Product.countDocuments();
 
+    if(!productCount) {
+        res.status(500).json({success: false})
+    }
+    res.send({productCount: productCount})
+})
+
+//get featured products
+router.get("/get/featured/:count",async (req, res)=> {
+    //if there count passed with the api then get it, if not get 0
+    const count = req.params.count ? req.params.count : 0
+    const featuredProducts = await Product.find({isFeatured: true}).limit(+count);
+
+    if(!featuredProducts) {
+        res.status(500).json({success: false})
+    }
+    res.send(featuredProducts)
+})
 module.exports = router;
