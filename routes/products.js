@@ -20,6 +20,33 @@ router.get("/:id", async (req, res) => {
 
 })
 
+
+
+//add new product
+router.post("/", async (req, res)=>{
+    const category = await Category.findById(req.body.category)
+    if(!category) return res.status(400).send("invalid category!")
+
+    let product = new Product({
+        name: req.body.name,
+        description: req.body.description,
+        richDescription: req.body.richDescription,
+        image: req.body.image,
+        brand: req.body.brand,
+        price: req.body.price,
+        category: req.body.category,
+        countInStock: req.body.countInStock,
+        rating: req.body.rating,
+        numReviews: req.body.numReviews,
+        isFeatured: req.body.isFeatured
+    })
+    product = await product.save();
+    if(!product) {
+        return res.status(404).send("the product can not be created!")
+
+    }
+})
+
 //update product
 router.put("/:id", async (req, res) => {
     const category = await Category.findById(req.body.category)
@@ -49,30 +76,18 @@ router.put("/:id", async (req, res) => {
     res.send(product)
 })
 
-//add new product
-router.post("/", async (req, res)=>{
-    const category = await Category.findById(req.body.category)
-    if(!category) return res.status(400).send("invalid category!")
-
-    let product = new Product({
-        name: req.body.name,
-        description: req.body.description,
-        richDescription: req.body.richDescription,
-        image: req.body.image,
-        brand: req.body.brand,
-        price: req.body.price,
-        category: req.body.category,
-        countInStock: req.body.countInStock,
-        rating: req.body.rating,
-        numReviews: req.body.numReviews,
-        isFeatured: req.body.isFeatured
+//delete a product
+router.delete("/:id", (req, res)=> {
+    Product.findByIdAndDelete(req.params.id).then(product => {
+        if(product) {
+            return res.status(200).json( {message:"the product is deleted successfully"})
+        } else {
+            return res.status(404).json({message:"there is no product with the given ID"})
+        }
+    }).catch(err => {
+        return res.status(500).json({success: false, error: err})
     })
-    product = await product.save();
-    if(!product) {
-        return res.status(404).send("the product can not be created!")
 
-    }
 })
-
 
 module.exports = router;
