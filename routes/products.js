@@ -11,13 +11,42 @@ router.get("/", async(req, res)=>{
 
 //get product by id
 router.get("/:id", async (req, res) => {
-    const product = await Product.findById(req.params.id);
+    const product = await Product.findById(req.params.id).populate("category");
 
     if(!product) {
         res.status(500).json({message: "there is no product with the given ID"})
     }
     res.status(200).send(product)
 
+})
+
+//update product
+router.put("/:id", async (req, res) => {
+    const category = await Category.findById(req.body.category)
+    if(!category) return res.status(400).send("invalid category!")
+
+    const product = await Product.findByIdAndUpdate(
+        req.params.id,
+        {
+            name: req.body.name,
+            description: req.body.description,
+            richDescription: req.body.richDescription,
+            image: req.body.image,
+            brand: req.body.brand,
+            price: req.body.price,
+            category: req.body.category,
+            countInStock: req.body.countInStock,
+            rating: req.body.rating,
+            numReviews: req.body.numReviews,
+            isFeatured: req.body.isFeatured
+        },
+        //show the updated product
+        {new: true}
+    )
+    if(!product) {
+        res.status(400).json({message: "there is no product with the given ID"})
+    }
+    res.send(product)
 })
 
 //add new product
