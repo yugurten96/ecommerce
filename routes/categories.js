@@ -2,15 +2,26 @@ const express = require("express");
 const {Category} = require("../models/category");
 const router = express.Router();
 
+//get all gategories
 router.get("/", async (req, res) => {
     const categoryList = await Category.find();
 
     if(!categoryList) {
         res.status(500).json({success : false})
     }
-    res.send(categoryList)
+    res.status(200).send(categoryList)
+})
+//get a category by id
+router.get("/:id", async (req, res) => {
+    const category = await Category.findById(req.params.id)
+
+    if(!category) {
+        res.status(500).json({message: "there is no category with the given ID"})
+    }
+    res.status(200).send(category)
 })
 
+//add a category
 router.post("/", async (req, res) => {
     let category = new Category({
         name: req.body.name,
@@ -21,9 +32,23 @@ router.post("/", async (req, res) => {
 
     if(!category) {
         return res.status(404).send("the category can not be created!")
-
-
     }
+})
+//update category
+router.put("/:id", async (req, res) => {
+    const category = await Category.findByIdAndUpdate(
+        req.params.id,
+        {
+            name: req.body.name,
+            icon: req.body.icon,
+            color: req.body.color
+        },
+        {new: true}
+    )
+    if(!category) {
+        res.status(400).json({message: "there is no category with the given ID"})
+    }
+    res.send(category)
 })
 
 //delete a category
