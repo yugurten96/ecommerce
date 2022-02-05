@@ -5,6 +5,7 @@ const morgan = require("morgan");
 const mongoose  = require("mongoose");
 const cors = require("cors");
 const authJwt = require("./helpers/jwt")
+const errorHandler = require("./helpers/error-handler")
 
 app.use(cors());
 app.options("*", cors)
@@ -15,6 +16,7 @@ app.use(morgan("tiny"))
 
 //authentication
 app.use(authJwt);
+app.use(errorHandler)
 //allow th cors for any application
 
 //routes
