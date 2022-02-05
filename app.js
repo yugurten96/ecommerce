@@ -4,6 +4,7 @@ require("dotenv/config");
 const morgan = require("morgan");
 const mongoose  = require("mongoose");
 const cors = require("cors");
+const authJwt = require("./helpers/jwt")
 
 app.use(cors());
 app.options("*", cors)
@@ -12,6 +13,8 @@ app.options("*", cors)
 app.use(express.json());
 app.use(morgan("tiny"))
 
+//authentication
+app.use(authJwt);
 //allow th cors for any application
 
 //routes
