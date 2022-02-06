@@ -5,6 +5,13 @@ function authJwt() {
     return expressJwt({
         secret,
         algorithms: ['HS256']
+    }).unless({
+        path: [
+            {url: /\/products(.*)/, methods: ['GET', 'OPTIONS']},
+            {url: /\/categories(.*)/, methods: ['GET', 'OPTIONS']},
+            "/users/login",
+            "/users/register"
+        ]
     })
 }
 
